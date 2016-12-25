@@ -88,8 +88,8 @@ function onItem(item, callback) {
  * удалить изображения)
  *
  * @param report
- * @param report.location           - Путь до файла с готовым отчетом (ссылку на него нужно вставить в личный
- *                                    кабинет партнера)
+ * @param report.location           - Путь до файла с готовым отчетом (ссылку на него нужно вставить в
+ *                                    личный кабинет партнера)
  * @param report.statistics.total   - Общее число объявление в фиде
  * @param report.statistics.success - Число объявление обработанных успешно
  * @param report.statistics.errors  - Число объявление обработанных с ошибками
