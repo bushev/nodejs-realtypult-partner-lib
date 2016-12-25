@@ -1,7 +1,7 @@
 {
   "name": "nodejs-realtypult-partner-lib",
   "version": "1.0.0",
-  "description": "Partner API library",
+  "description": "API библиотека для интеграции с RealtyPult",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec --timeout 60000"
@@ -13,7 +13,10 @@
   "keywords": [
     "realtypult",
     "partner",
-    "xml"
+    "xml",
+    "интеграция",
+    "партнерская",
+    "программа"
   ],
   "author": "Yury Bushev",
   "license": "MIT",
@@ -35,5 +38,9 @@
     "mocha": "3.2.0",
     "should": "11.1.2",
     "xml2js": "0.4.17"
+  },
+  "engines": {
+    "node": ">=6.9.2",
+    "npm": ">=3.10.9"
   }
 }
