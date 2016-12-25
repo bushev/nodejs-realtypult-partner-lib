@@ -181,6 +181,9 @@ describe('Feed handling', () => {
                 report.statistics.errors.should.equal(0);
 
                 parser.parseString(fs.readFileSync(reportFileLocation, 'utf8'), (err, reportObject) => {
+                    should.not.exists(err);
+
+                    fs.unlinkSync(reportFileLocation);
 
                     reportObject.objects.object.should.be.lengthOf(2);
 
@@ -219,6 +222,9 @@ describe('Feed handling', () => {
                 report.statistics.errors.should.equal(0);
 
                 parser.parseString(fs.readFileSync(reportFileLocation, 'utf8'), (err, reportObject) => {
+                    should.not.exists(err);
+
+                    fs.unlinkSync(reportFileLocation);
 
                     reportObject.objects.object.should.be.lengthOf(2);
 
@@ -257,7 +263,10 @@ describe('Feed handling', () => {
                 report.statistics.errors.should.equal(2);
 
                 parser.parseString(fs.readFileSync(reportFileLocation, 'utf8'), (err, reportObject) => {
+                    should.not.exists(err);
 
+                    fs.unlinkSync(reportFileLocation);
+                    
                     reportObject.objects.object.should.be.lengthOf(2);
 
                     reportObject.objects.object[0].$.id.should.equal('679511');
