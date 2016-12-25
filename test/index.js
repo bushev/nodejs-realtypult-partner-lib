@@ -50,17 +50,37 @@ let parser = new xml2js.Parser({explicitArray: false});
 
 function onItemSuccessWithViews(item, callback) {
 
-    callback(null, {url: `http://your-site.ru/item-${item.id}`, views: 15});
+    callback({url: `http://your-site.ru/item-${item.id}`, views: 15});
 }
 
 function onItemSuccessWithoutViews(item, callback) {
 
-    callback(null, {url: `http://your-site.ru/item-${item.id}`});
+    callback({url: `http://your-site.ru/item-${item.id}`});
 }
 
 function onItemError(item, callback) {
 
     callback({error: 'Что-то плохое случилось'});
+}
+
+function onItemRejection(item, callback) {
+
+    callback({rejectReason: 'Номер телефона заблокирован'});
+}
+
+function onItemDuplication(item, callback) {
+
+    callback({similarUrl: `http://your-site.ru/item-${item.id}`});
+}
+
+function onItemBadCallbackWrongData(item, callback) {
+
+    callback({similarUrl123: `http://your-site.ru/item-${item.id}`});
+}
+
+function onItemBadCallbackNoData(item, callback) {
+
+    callback();
 }
 
 function onEnd(report) {
@@ -161,6 +181,57 @@ describe('Create instance', () => {
     });
 });
 
+describe('Bad callback', () => {
+
+    it('wrong data provided', done => {
+
+        let reportFileLocation = path.join(os.tmpdir(), `my-realtypult-report-${randomstring.generate(5)}.xml`);
+
+        let importer = new Importer({
+            xmlFeedUrl: FEED_URL,
+            reportFileLocation: reportFileLocation,
+            format: 'realtypult',
+            onItem: onItemBadCallbackWrongData,
+            onEnd: report => {
+
+                'I should not be here'.should.not.be.ok();
+            },
+            onError: err => {
+
+                err.message.should.equal('Importer::onItem: unexpected data');
+
+                done();
+            }
+        });
+
+        importer.run();
+    });
+
+    it('no data provided', done => {
+
+        let reportFileLocation = path.join(os.tmpdir(), `my-realtypult-report-${randomstring.generate(5)}.xml`);
+
+        let importer = new Importer({
+            xmlFeedUrl: FEED_URL,
+            reportFileLocation: reportFileLocation,
+            format: 'realtypult',
+            onItem: onItemBadCallbackNoData,
+            onEnd: report => {
+
+                'I should not be here'.should.not.be.ok();
+            },
+            onError: err => {
+
+                err.message.should.equal('Importer::onItem: data must be an object');
+
+                done();
+            }
+        });
+
+        importer.run();
+    });
+});
+
 describe('Feed handling', () => {
 
     it('report with views', done => {
@@ -178,6 +249,7 @@ describe('Feed handling', () => {
 
                 report.statistics.total.should.equal(2);
                 report.statistics.success.should.equal(2);
+                report.statistics.rejected.should.equal(0);
                 report.statistics.errors.should.equal(0);
 
                 parser.parseString(fs.readFileSync(reportFileLocation, 'utf8'), (err, reportObject) => {
@@ -190,10 +262,16 @@ describe('Feed handling', () => {
                     reportObject.objects.object[0].$.id.should.equal('679511');
                     reportObject.objects.object[0].url.should.containEql(`http://your-site.ru/item-`);
                     reportObject.objects.object[0].views.should.equal('15');
+                    should.not.exists(reportObject.objects.object[0].similarUrl);
+                    should.not.exists(reportObject.objects.object[0].error);
+                    should.not.exists(reportObject.objects.object[0].rejectReason);
 
                     reportObject.objects.object[1].$.id.should.equal('679512');
                     reportObject.objects.object[1].url.should.containEql(`http://your-site.ru/item-`);
                     reportObject.objects.object[1].views.should.equal('15');
+                    should.not.exists(reportObject.objects.object[1].similarUrl);
+                    should.not.exists(reportObject.objects.object[1].error);
+                    should.not.exists(reportObject.objects.object[1].rejectReason);
 
                     done();
                 });
@@ -219,6 +297,7 @@ describe('Feed handling', () => {
 
                 report.statistics.total.should.equal(2);
                 report.statistics.success.should.equal(2);
+                report.statistics.rejected.should.equal(0);
                 report.statistics.errors.should.equal(0);
 
                 parser.parseString(fs.readFileSync(reportFileLocation, 'utf8'), (err, reportObject) => {
@@ -230,11 +309,17 @@ describe('Feed handling', () => {
 
                     reportObject.objects.object[0].$.id.should.equal('679511');
                     reportObject.objects.object[0].url.should.containEql(`http://your-site.ru/item-`);
+                    should.not.exists(reportObject.objects.object[0].error);
                     should.not.exists(reportObject.objects.object[0].views);
+                    should.not.exists(reportObject.objects.object[0].similarUrl);
+                    should.not.exists(reportObject.objects.object[0].rejectReason);
 
                     reportObject.objects.object[1].$.id.should.equal('679512');
                     reportObject.objects.object[1].url.should.containEql(`http://your-site.ru/item-`);
+                    should.not.exists(reportObject.objects.object[1].error);
                     should.not.exists(reportObject.objects.object[1].views);
+                    should.not.exists(reportObject.objects.object[1].similarUrl);
+                    should.not.exists(reportObject.objects.object[1].rejectReason);
 
                     done();
                 });
@@ -260,24 +345,127 @@ describe('Feed handling', () => {
 
                 report.statistics.total.should.equal(2);
                 report.statistics.success.should.equal(0);
+                report.statistics.rejected.should.equal(0);
                 report.statistics.errors.should.equal(2);
 
                 parser.parseString(fs.readFileSync(reportFileLocation, 'utf8'), (err, reportObject) => {
                     should.not.exists(err);
 
                     fs.unlinkSync(reportFileLocation);
-                    
+
                     reportObject.objects.object.should.be.lengthOf(2);
 
                     reportObject.objects.object[0].$.id.should.equal('679511');
                     reportObject.objects.object[0].error.should.equal('Что-то плохое случилось');
+                    should.not.exists(reportObject.objects.object[0].similarUrl);
+                    should.not.exists(reportObject.objects.object[0].rejectReason);
                     should.not.exists(reportObject.objects.object[0].url);
                     should.not.exists(reportObject.objects.object[0].views);
 
                     reportObject.objects.object[1].$.id.should.equal('679512');
                     reportObject.objects.object[1].error.should.equal('Что-то плохое случилось');
+                    should.not.exists(reportObject.objects.object[1].similarUrl);
+                    should.not.exists(reportObject.objects.object[1].rejectReason);
                     should.not.exists(reportObject.objects.object[1].url);
                     should.not.exists(reportObject.objects.object[1].views);
+
+                    done();
+                });
+            },
+            onError: onError
+        });
+
+        importer.run();
+    });
+
+    it('report with rejections', done => {
+
+        let reportFileLocation = path.join(os.tmpdir(), `my-realtypult-report-${randomstring.generate(5)}.xml`);
+
+        let importer = new Importer({
+            xmlFeedUrl: FEED_URL,
+            reportFileLocation: reportFileLocation,
+            format: 'realtypult',
+            onItem: onItemRejection,
+            onEnd: report => {
+
+                report.location.should.equal(reportFileLocation);
+
+                report.statistics.total.should.equal(2);
+                report.statistics.success.should.equal(0);
+                report.statistics.rejected.should.equal(2);
+                report.statistics.errors.should.equal(0);
+
+                parser.parseString(fs.readFileSync(reportFileLocation, 'utf8'), (err, reportObject) => {
+                    should.not.exists(err);
+
+                    fs.unlinkSync(reportFileLocation);
+
+                    reportObject.objects.object.should.be.lengthOf(2);
+
+                    reportObject.objects.object[0].$.id.should.equal('679511');
+                    reportObject.objects.object[0].rejectReason.should.equal('Номер телефона заблокирован');
+                    should.not.exists(reportObject.objects.object[0].similarUrl);
+                    should.not.exists(reportObject.objects.object[0].error);
+                    should.not.exists(reportObject.objects.object[0].url);
+                    should.not.exists(reportObject.objects.object[0].views);
+
+                    reportObject.objects.object[1].$.id.should.equal('679512');
+                    reportObject.objects.object[1].rejectReason.should.equal('Номер телефона заблокирован');
+                    should.not.exists(reportObject.objects.object[1].similarUrl);
+                    should.not.exists(reportObject.objects.object[1].error);
+                    should.not.exists(reportObject.objects.object[1].url);
+                    should.not.exists(reportObject.objects.object[1].views);
+
+                    done();
+                });
+            },
+            onError: onError
+        });
+
+        importer.run();
+    });
+
+    it('report with duplications', done => {
+
+        let reportFileLocation = path.join(os.tmpdir(), `my-realtypult-report-${randomstring.generate(5)}.xml`);
+
+        let importer = new Importer({
+            xmlFeedUrl: FEED_URL,
+            reportFileLocation: reportFileLocation,
+            format: 'realtypult',
+            onItem: onItemDuplication,
+            onEnd: report => {
+
+                report.location.should.equal(reportFileLocation);
+
+                report.statistics.total.should.equal(2);
+                report.statistics.success.should.equal(0);
+                report.statistics.rejected.should.equal(2);
+                report.statistics.errors.should.equal(0);
+
+                parser.parseString(fs.readFileSync(reportFileLocation, 'utf8'), (err, reportObject) => {
+                    should.not.exists(err);
+
+                    fs.unlinkSync(reportFileLocation);
+
+                    reportObject.objects.object.should.be.lengthOf(2);
+
+                    reportObject.objects.object[0].$.id.should.equal('679511');
+                    reportObject.objects.object[0].similarUrl.should.containEql(`http://your-site.ru/item-`);
+                    should.not.exists(reportObject.objects.object[0].error);
+                    should.not.exists(reportObject.objects.object[0].url);
+                    should.not.exists(reportObject.objects.object[0].views);
+                    should.not.exists(reportObject.objects.object[0].rejectReason);
+
+
+                    reportObject.objects.object[1].$.id.should.equal('679512');
+                    reportObject.objects.object[1].similarUrl.should.containEql(`http://your-site.ru/item-`);
+                    should.not.exists(reportObject.objects.object[1].error);
+                    should.not.exists(reportObject.objects.object[1].url);
+                    should.not.exists(reportObject.objects.object[1].views);
+                    should.not.exists(reportObject.objects.object[1].rejectReason);
+
                     done();
                 });
             },
