@@ -12,7 +12,7 @@ let importer = new Importer({
     xmlFeedUrl: 'https://realtypult.ru/api/xml/export/partner/FORMAT/TOKEN',
 
     // Путь к файлу отчета, файл будет создаваться автоматически
-    reportFileLocation: '/Users/bushev/Downloads/rm-report.xml',
+    reportFileLocation: '/var/www/my-site/public/rm-report.xml',
 
     // Формат XML фида ('realtypult' или 'yandex')
     format: 'realtypult',
