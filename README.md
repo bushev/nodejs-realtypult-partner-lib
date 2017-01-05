@@ -2,6 +2,10 @@
 
 API библиотека для интеграции с RealtyPult
 
+## Нужна версия для PHP?
+
+[https://github.com/bushev/php-realtypult-partner-lib](https://github.com/bushev/php-realtypult-partner-lib)
+
 ## Как установить
 
 `npm install nodejs-realtypult-partner-lib --save`
