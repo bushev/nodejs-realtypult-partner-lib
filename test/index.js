@@ -39,7 +39,7 @@ const xml2js = require('xml2js');
 
 const Importer = require('../index').Importer;
 
-const FEED_URL = 'https://dev.realtypult.ru/xml/import-feed-realtypult.xml';
+const FEED_URL = 'https://realtypult.ru/xml/import-feed-realtypult.xml';
 
 /**
  * Parser
@@ -98,7 +98,7 @@ describe('Create instance', () => {
     it('success', () => {
         (() => {
             let importer = new Importer({
-                xmlFeedUrl: 'https://dev.realtypult.ru/xml/import-feed-realtypult.xml',
+                xmlFeedUrl: 'https://realtypult.ru/xml/import-feed-realtypult.xml',
                 reportFileLocation: '/Users/bushev/Downloads/rm-report.xml',
                 format: 'realtypult',
                 onItem: onItemSuccessWithViews,
@@ -123,7 +123,7 @@ describe('Create instance', () => {
     it('without reportFileLocation', () => {
         (() => {
             let importer = new Importer({
-                xmlFeedUrl: 'https://dev.realtypult.ru/xml/import-feed-realtypult.xml',
+                xmlFeedUrl: 'https://realtypult.ru/xml/import-feed-realtypult.xml',
                 format: 'realtypult',
                 onItem: onItemSuccessWithViews,
                 onEnd: onEnd,
@@ -135,7 +135,7 @@ describe('Create instance', () => {
     it('without format', () => {
         (() => {
             let importer = new Importer({
-                xmlFeedUrl: 'https://dev.realtypult.ru/xml/import-feed-realtypult.xml',
+                xmlFeedUrl: 'https://realtypult.ru/xml/import-feed-realtypult.xml',
                 reportFileLocation: '/Users/bushev/Downloads/rm-report.xml',
                 onItem: onItemSuccessWithViews,
                 onEnd: onEnd,
@@ -147,7 +147,7 @@ describe('Create instance', () => {
     it('without onItem', () => {
         (() => {
             let importer = new Importer({
-                xmlFeedUrl: 'https://dev.realtypult.ru/xml/import-feed-realtypult.xml',
+                xmlFeedUrl: 'https://realtypult.ru/xml/import-feed-realtypult.xml',
                 format: 'realtypult',
                 reportFileLocation: '/Users/bushev/Downloads/rm-report.xml',
                 onEnd: onEnd,
@@ -159,7 +159,7 @@ describe('Create instance', () => {
     it('without onEnd', () => {
         (() => {
             let importer = new Importer({
-                xmlFeedUrl: 'https://dev.realtypult.ru/xml/import-feed-realtypult.xml',
+                xmlFeedUrl: 'https://realtypult.ru/xml/import-feed-realtypult.xml',
                 format: 'realtypult',
                 reportFileLocation: '/Users/bushev/Downloads/rm-report.xml',
                 onItem: onItemSuccessWithViews,
@@ -171,7 +171,7 @@ describe('Create instance', () => {
     it('without onError', () => {
         (() => {
             let importer = new Importer({
-                xmlFeedUrl: 'https://dev.realtypult.ru/xml/import-feed-realtypult.xml',
+                xmlFeedUrl: 'https://realtypult.ru/xml/import-feed-realtypult.xml',
                 format: 'realtypult',
                 reportFileLocation: '/Users/bushev/Downloads/rm-report.xml',
                 onItem: onItemSuccessWithViews,

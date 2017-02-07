@@ -1,6 +1,6 @@
 # nodejs-realtypult-partner-lib [![CircleCI](https://circleci.com/gh/bushev/nodejs-realtypult-partner-lib.svg?style=svg)](https://circleci.com/gh/bushev/nodejs-realtypult-partner-lib)
 
-API библиотека для интеграции с RealtyPult
+API библиотека для интеграции с RealtyPult. Подключении портала недвижимости к [партнерской программе](https://realtypult.ru/partner/signup).
 
 ## Нужна версия для PHP?
 
