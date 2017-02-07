@@ -1,6 +1,6 @@
 {
   "name": "nodejs-realtypult-partner-lib",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "API библиотека для интеграции с RealtyPult",
   "main": "index.js",
   "scripts": {
